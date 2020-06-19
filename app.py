@@ -11,6 +11,7 @@ app = FastAPI()
 
 script = "./script"
 
+comandodocker = "sudo docker run python python -c "
 
 class Item(BaseModel):
     message: str
@@ -19,26 +20,25 @@ class Item(BaseModel):
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/tasks/{item_id}")
+@app.get("/tasks")
 def read_item(item_id: int):
     return {"item_id": item_id}
 
-@app.post("/tasks/{item_id}") 
-async def post(item_id: int, item: Item):
+@app.post("/post") 
+async def post(item: Item):
     msg = item.message
+    msg = msg.replace('/', '"')
     print(msg)
-    #prog = open("helloword.py", "w")
-    #prog.write(msg)
-    #prog.close()
-    comando = "sudo docker run python python -c " + msg
+    prog = open("helloword.py", "w")
+    prog.write(msg)
+    prog.close() 
     try:
-        stream = os.popen(comando)
+        dock = os.popen(comandodocker+msg)
     except:
         print('erro')
-    output = stream.read()
-    file = "./result.txt"
-    with open(file, 'r') as result:
-        result = result.read()
-        print(output)
-    return {"mensagem": result, "item_id": item_id}
+
+    result = dock.read()
+    print(result)
+
+    return {"mensagem": result}
 
